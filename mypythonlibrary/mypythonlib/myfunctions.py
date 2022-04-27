@@ -505,11 +505,19 @@ def PDE_solve_euler(kappa,L,T,initial_condition, args=(), boundary_condition=Non
         offset = [-1,0,1]
         A = diags(k,offset).toarray()
 
-        for i in range(0, mx+1):
-            u_j[i] = initial_condition(x[i])
+        if callable(initial_condition) is False:
+            u_j = initial_condition
+
+
+        else:
+            for i in range(0, mx+1):
+                u_j[i] = initial_condition(x[i])
+
+        #for i in range(0, mx+1):
+           # u_j[i] = initial_condition(x[i])
 
         for j in range(0, mt):
-            u_j = rhs_function(A, u_j,F_j,u_jp1,j,deltat,x,t)
+            u_j = rhs_function(A, u_j,F_j,u_jp1,j,deltat,x,t,mx)
 
 
     else:
@@ -584,7 +592,7 @@ def Numerical_Continuation_kappa(L, T, initial_condition, start, end, h, args, b
 
     return
 
-def rhs_function(A, u_j,F_j,u_jp1,j,deltat,x,t):
+def rhs_function(A, u_j,F_j,u_jp1,j,deltat,x,t,mx):
     u_jp1[1:-1] = np.matmul(A , u_j[1:-1]).reshape(19,1) + deltat*F_j(x[1:-1],t[j]).reshape(19,1)
     u_j = u_jp1
     return u_j
@@ -612,6 +620,20 @@ def Neumann_boundary(A,s,u_j,lmbda,deltax,args):
     return u_j
 
 
+def Numerical_Continuation_kappa(L, T, initial_condition, start, end, h, args, boundary_condition=None, mx=20, mt=1000):
 
+    n = []
+
+    for parameter in np.arange(start,end,h):
+        root = PDE_solve_euler(parameter,L,T,initial_condition, args=args, boundary_condition=boundary_condition,mx=20,mt=1000)
+        initial_condition = root
+        n.append(root)
+
+    i=0
+    for i in range(len(n)):
+        plt.plot(np.linspace(0, L, mx+1),n[i],'ro',label='num')
+
+    plt.show()
+    return
 
 

@@ -3,7 +3,7 @@ import mypythonlib
 from mypythonlib import myfunctions
 
 
-# import functions
+# import modules
 import numpy as np
 import math
 import matplotlib.pyplot as plt
@@ -13,11 +13,11 @@ from scipy.integrate import solve_ivp
 from scipy.sparse import diags
 from math import pi
 
-# Define the ODE we wish to solve
+
+
+# Define an ODE we wish to solve using one of the numerical integration methods
 def f(x,t):
     return x
-
-
 
 # Produce a plot with double logarithmic scale showing how the error depends on the size of the timestep
 # for the euler method, 4th order Runge-Kutta method, Heun's method and Midpoint method
@@ -40,30 +40,31 @@ plt.loglog(np.arange(0.0001,1,0.0001), error_runga)
 plt.loglog(np.arange(0.0001,1,0.0001), error_euler)
 plt.loglog(np.arange(0.0001,1,0.0001), error_heuns)
 plt.loglog(np.arange(0.0001,1,0.0001), error_midpoint)
-#plt.loglog(np.arange(0.0001,1,0.0001), error_rk3)
-#plt.axhline(y=0.0006342732424382547, color='g')
-
 plt.legend(['Runge-Kutta error','euler method error','heuns method error', 'midpoint method error'])
 plt.title('How does error depend on the size of the timestep for different integration methods')
 plt.xlabel('\u0394t')
 plt.ylabel('error')
 plt.show()
 
-# Define a system of ODEs
+
+
+
+# Define a system of ODEs that we wish to solve using the numerical integration methods
 def fun(X,t):
     x = X[0]
     y = X[1]
     return np.array([y,-x])
 
-# Define the exact solution of the ODE we wish to solve
+# Define the analytical solution of the ODE we wish to solve so we can compare the outputs
 def x_exact(t):
     return np.cos(t) + np.sin(t)
+
 
 def xdot_exact(t):
     return -np.sin(t) + np.cos(t)
 
 
-#Plotting the results of system of ODEs
+#Plotting the results of the solution to the system of ODEs
 t = np.arange(0,10,0.1)
 results_euler = myfunctions.solve_ode_system(fun,0.1,0,[1,1],t,myfunctions.euler_solve_step)
 results_rk4 = myfunctions.solve_ode_system(fun,0.1,0,[1,1],t,myfunctions.rk4_solve_step)
@@ -86,7 +87,6 @@ results_euler = myfunctions.solve_ode_system(fun,0.1,0,[1,1],t,myfunctions.euler
 results_rk4 = myfunctions.solve_ode_system(fun,0.1,0,[1,1],t,myfunctions.rk4_solve_step)
 results_heuns = myfunctions.solve_ode_system(fun,0.1,0,[1,1],t,myfunctions.heuns_solve_step)
 
-fig=plt.figure(figsize=(8,6))
 plt.plot([state[0] for state in results_euler],[state[1] for state in results_euler])
 plt.plot([state[0] for state in results_rk4],[state[1] for state in results_rk4],'r')
 plt.plot([state[0] for state in results_heuns],[state[1] for state in results_heuns])
@@ -99,14 +99,13 @@ plt.title('Graph displaying the solution of the system of ODEs')
 plt.show()
 
 
-# shooting
+# Demonstrating using the numerical shooting function:
+# To demonstrate how the shooting function works I will be using the predator-prey equations
 
-
-# setting pararmeters
+# defining pararmeters
 a = 1
 b = 0.2
 d= 0.1
-
 
 # defining a system of 2 ODEs (predator-prey equations)
 def PredPrey(t,Z,a,b,d):
@@ -114,22 +113,28 @@ def PredPrey(t,Z,a,b,d):
     y = Z[1]
     return [x*(1-x) - (a*x*y)/(d+x), (b*y)*(1 - y/x)]
 
+# finding the solution to the equations using an inbuilt python function
 sol = solve_ivp(PredPrey, (0,100),(1,1), args=(a,b,d), rtol=1e-6)
 
 # plotting a graph of the solutions
-
 plt.plot(sol.t,sol.y[0])
 plt.plot(sol.t,sol.y[1])
 plt.legend(['Predator','Prey'])
 plt.xlabel('t')
 plt.ylabel('Number of Prey and Predators')
-plt.title('Predator-Prey equations using Runge-Kutta method')
+plt.title('Predator-Prey equations')
 plt.show()
 
 #
 plt.plot(sol.y[0], sol.y[1])
+plt.xlabel('predator')
+plt.ylabel('prey')
+plt.title('Predator plotted against Prey')
 plt.show()
 
+
+# Here we use the shooting function on the predator-prey equations by inputting an initial guess of (1.5,1.5) and a
+# period guess of 20. The phase condition is the phase condition imported from the myfunctions library.
 root = fsolve(myfunctions.shooting,[1.5,1.5,20],args = (PredPrey, myfunctions.phase_condition_func, (a,b,d)))
 
 #plot the solution for one periodic orbit
@@ -139,11 +144,13 @@ plt.plot(sol.t, sol.y[1])
 plt.legend(['Predator','Prey'])
 plt.xlabel('t')
 plt.ylabel('Number of Prey and Predators')
-plt.title('Predator-Prey equations using Runge-Kutta method for one periodic orbit')
+plt.title('Predator-Prey equations for one periodic orbit')
 plt.show()
 
 
-# define the varaibles
+# Applying the shooting to system of 3 ODEs
+
+# define the variables
 m = 8
 n = 30
 c = 8/3
@@ -156,24 +163,29 @@ def system2(t,Z,m,n,c):
     zdot = x*y - c*z
     return [xdot,ydot,zdot]
 
-#root = fsolve(myfunctions.shooting,[-1,0,1,10],args = (system2,myfunctions.phase_condition_func,(m,n,c)))
+
+# Using the shooting code for the system of 3 ODEs means our initial guess now contains 3 initial guesses for x, y and z
+# followed by a period.
+root = fsolve(myfunctions.shooting,[-1,0,1,10],args = (system2,myfunctions.phase_condition_func,(m,n,c)))
 
 #plot the solution for one periodic orbit
 
-#sol = solve_ivp(system2, (0,root[-1]), root[:-1], args = (m,n,c), rtol = 1e-6)
-#plt.plot(sol.t, sol.y[0])
-#plt.plot(sol.t, sol.y[1])
-#plt.plot(sol.t, sol.y[2])
-#plt.legend(['x(t)','y(t)','z(t)'])
-#plt.xlabel('t')
-#plt.ylabel('')
-#plt.title('Solution of system of three first-order ODEs')
-#plt.show()
+sol = solve_ivp(system2, (0,root[-1]), root[:-1], args = (m,n,c), rtol = 1e-6)
+plt.plot(sol.t, sol.y[0])
+plt.plot(sol.t, sol.y[1])
+plt.plot(sol.t, sol.y[2])
+plt.legend(['x(t)','y(t)','z(t)'])
+plt.xlabel('t')
+plt.ylabel('')
+plt.title('Solution of a system of three first-order ODEs')
+plt.show()
 
 
-# code testing
+# Here we will explore using the Hopf and modified Hopf bifurcation equations. We will use the numerical shooting
+# function and import the testing functions to see if the solution produced by the shooting is within a certain
+# tolerance of the exact solution.
 
-# The Hopf bifurcation equations
+# Defining the Hopf bifurcation equations
 def Hopf(t,z,b,s):
     u1, u2 = z[0], z[1]
     return np.array([b*u1 - u2 + s*u1*(u1**2 + u2**2), u1 + b*u2 + s*u2*(u1**2 +u2**2)])
@@ -182,19 +194,25 @@ def Hopf(t,z,b,s):
 b = 1
 s = -1
 
+# Import the tests
+# The test files are specific so testing_2ODE will only work for the system of 2 first order Hopf equations. Here I use
+# an initial guess that I know should return a root close to the true value. If this is the case, the output will return
+# 'passed'
 from tests import test_myfunctions
 test_myfunctions.testing_2ODE(myfunctions.shooting,[1,0,6.2],(Hopf,myfunctions.phase_condition_func,(1,-1)))
 
-# add another dimension for the Hopf bifurcation equations
-#so that we have a system of 3 ODE's
-def k(t,z,b,s):
+# adding another dimension to the Hopf bifurcation equations so that we have a system of 3 ODE's
+def ODE_system3(t,z,b,s):
     u1, u2, u3 = z[0], z[1], z[2]
     return [b*u1 - u2 + s*u1*(u1**2 + u2**2), u1 + b*u2 + s*u2*(u1**2 +u2**2), -u3]
 
-test_myfunctions.testing_3ODE(myfunctions.shooting,[3,2,3,6.2],(k,myfunctions.phase_condition_func,(1,-1)))
+# Testing the shooting for the system of 3 ODEs
+test_myfunctions.testing_3ODE(myfunctions.shooting,[3,2,3,6.2],(ODE_system3,myfunctions.phase_condition_func,(1,-1)))
 
 
-# continutaion
+# Next, I will demonstrate how to use the numerical continuation functions found in the library
+
+# Defining equations that I will use in the examples
 
 # The algebraic cubic equation
 def cubic(x,c):
@@ -205,6 +223,7 @@ def mod_Hopf(t,z,b,s):
     u1, u2 = z[0], z[1]
     return [b*u1 - u2 + s*u1*(u1**2 + u2**2) - u1*(u1**2 + u2**2)**2, u1 + b*u2 + s*u2*(u1**2 +u2**2) - u2*(u1**2 + u2**2)**2]
 
+# setting parameters
 c=1
 b=1
 s=-1
@@ -354,10 +373,35 @@ plt.show()
 # Plot the final result and exact solution for forward euler
 #pl.plot(x,PDE_solve_euler(1000,10,[0,0],u_I,args=(lambda t:u_diff(0,t),lambda t:u_diff(L,t)),dirichlet=None,neumann=None,periodic=None, rhs=rhs_function),'ro',label='num')
 x = np.linspace(0, 1, 20+1)
-plt.plot(x,myfunctions.PDE_solve_euler(2,1,0.5,u_I6, args=(lambda x,t: np.sin(5*pi*x)), boundary_condition = 'rhs'),'ro',label='num')
+plt.plot(x,myfunctions.PDE_solve_euler(2,1,0.5,u_I6, args=(lambda x,t: np.sin(5*pi*x)), boundary_condition = 'rhs',mx=20,mt=1000),'ro',label='num')
 xx = np.linspace(0,1,250)
 plt.plot(xx,u_exact6(xx,0.5),'b-',label='exact')
 plt.xlabel('x')
 plt.ylabel('u(x,0.5)')
 plt.legend(loc='upper right')
+plt.show()
+
+
+# plotting the solution of the heat equation with a homogenous neumann boundary condition. Observing how the steady
+# states change as we increment the diffusion coefficient from 0 to 2.
+L=1
+myfunctions.Numerical_Continuation_kappa(1, 0.5, u_I, 0, 2, 0.1, args=(lambda t:0, lambda t:0), boundary_condition='dirichlet', mx=20, mt=1000)
+xx = np.linspace(0,1,250)
+T = 0.5
+for kappa in np.arange(0,2,0.1):
+    y = np.exp(-kappa*(pi**2/L**2)*T)*np.sin(pi*xx/L)
+    plt.plot(xx,y,'b-',label='exact')
+plt.show()
+
+
+
+
+# kappa continuation for heat equation with rhs function
+L=1
+T = 0.5
+xx = np.linspace(0,1,21)
+myfunctions.Numerical_Continuation_kappa(1,0.5,u_I6, 0.1,2,0.1,args=(lambda x,t: np.sin(5*pi*x)), boundary_condition = 'rhs',mx=20,mt=1000)
+for kappa in np.arange(0.1,2,0.1):
+    y = 4*np.exp(-T*kappa*(3*pi)**2)*np.sin(3*pi*x) + (1/(25*kappa*pi**2))*np.exp(-T*kappa*(5*pi)**2)*np.sin(5*pi*x) + 9*np.exp(-T*(7*pi)**2)*np.sin(7*pi*x) + (1/(kappa*25*pi**2))*np.sin(5*pi*x)
+    plt.plot(xx,y,'b-',label='exact')
 plt.show()
