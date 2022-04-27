@@ -349,6 +349,12 @@ plt.legend(loc='upper right')
 plt.title('Solution of the heat equation with an inhomogenous dirichlet boundary')
 plt.show()
 
+# Another way of testing the solution more technically rather than visually is to import the testing_dirichlet function
+# from the test_myfunctions
+test_myfunctions.testing_dirichlet(myfunctions.PDE_solve_euler,9,2,0.5,u_I4,args=(lambda t:0, lambda t:8), boundary_condition='dirichlet',mx=20,mt=1000)
+
+
+
 
 # periodic boundary condition example:
 # using the PDE_solve_euler function with the initial condition defined as u_I7
@@ -369,6 +375,8 @@ plt.legend(loc='upper right')
 plt.title('Solution of the heat equation with a periodic boundary')
 plt.show()
 
+test_myfunctions.testing_periodic(myfunctions.PDE_solve_euler,1,1,0.5,u_I7, args=(), boundary_condition = 'periodic')
+
 
 
 # homogenous neumann boundary condition example:
@@ -388,6 +396,9 @@ plt.ylabel('u(x,0.5)')
 plt.legend(loc='upper right')
 plt.title('Solution of the heat equation with a homogenous neumann boundary')
 plt.show()
+
+test_myfunctions.testing_neumann(myfunctions.PDE_solve_euler,u_I3, args=(lambda t:0, lambda t:0), boundary_condition = 'neumann')
+
 
 
 # inhomogenous heat equation (rhs function) example:

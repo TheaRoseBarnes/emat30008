@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from scipy.optimize import fsolve
 from scipy.integrate import solve_ivp
 from scipy.optimize import fsolve
+from math import pi
 
 
 # define a test script that runs the shooting code and checks it against its true solution
@@ -61,3 +62,78 @@ def testing_3ODE(solver, initial_guess, args):
         else:
             result = print('Test failed')
         return result
+
+
+def testing_dirichlet(solver,k,L,T,initial_condition,args, boundary_condition= 'Dirichlet',mx=20,mt=1000):
+
+
+    # adding tests to check that the code handles errors gracefully
+   # if np.size(initial_guess) != 3:
+        #print("must specify 3 input arguments for a system of 2 ODE's")
+    #else:
+
+    root = solver(k,L,T,initial_condition,args=args, boundary_condition= boundary_condition,mx=mx,mt=mt)
+
+    n = []
+    for i in np.linspace(0,L,mx+1):
+        true_sol = 4*i - ((64/pi**3)*np.exp(T*(-9/4)*pi**2)*np.sin(pi*i/2))
+        n.append(true_sol)
+
+    error = [a - b for a, b in zip(n, root)]
+    h = np.zeros(mx+1)
+
+    if np.allclose(error,h,rtol=1e-04, atol=1e-04) == True:
+        result = print('Test passed')
+    else:
+        result = print('Test failed')
+    return
+
+
+def testing_periodic(solver,k,L,T,initial_condition,args, boundary_condition= 'Dirichlet',mx=20,mt=1000):
+
+    # adding tests to check that the code handles errors gracefully
+   # if np.size(initial_guess) != 3:
+        #print("must specify 3 input arguments for a system of 2 ODE's")
+    #else:
+
+    root = solver(k,L,T,initial_condition,args=args, boundary_condition= boundary_condition,mx=mx,mt=mt)
+
+    n = []
+    for i in np.linspace(0,L,mx):
+        true_sol = np.exp(-4*T*pi**2)*np.cos(2*pi*i)
+        n.append(true_sol)
+
+    error = [a - b for a, b in zip(n, root)]
+    h = np.zeros(mx)
+
+    if np.allclose(error,h,rtol=1e-04, atol=1e-04) == True:
+        result = print('Test passed')
+    else:
+        result = print('Test failed')
+    return
+
+
+def testing_neumann(solver,initial_condition,args, boundary_condition= 'Dirichlet',mx=20,mt=1000):
+
+    # adding tests to check that the code handles errors gracefully
+   # if np.size(initial_guess) != 3:
+        #print("must specify 3 input arguments for a system of 2 ODE's")
+    #else:
+    L = 2
+    T = 0.5
+    k=1
+    root = solver(k,L,T,initial_condition,args=args, boundary_condition= boundary_condition,mx=mx,mt=mt)
+
+    n = []
+    for i in np.linspace(0,L,mx):
+        true_sol = 0.5*(5*(1-np.cos(2))) - ((20*np.cos(2) + 20)/(-4 + pi**2))*np.exp(-(pi**2)*T/2**2)*np.cos(pi*i/2)
+        n.append(true_sol)
+
+    error = [a - b for a, b in zip(n, root)]
+    h = np.zeros(mx)
+
+    if np.allclose(error,h,rtol=1e-04, atol=1e-04) == True:
+        result = print('Test passed')
+    else:
+        result = print('Test failed')
+    return
