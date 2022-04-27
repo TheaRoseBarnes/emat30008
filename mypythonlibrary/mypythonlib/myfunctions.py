@@ -372,6 +372,15 @@ def Numerical_Continuation_x(initial_guess, fun, start, end, h, parameter):
     plt.legend(['x','y','period'], loc = "upper right")
     return
 
+def Hopf(t,z,b,s):
+    u1, u2 = z[0], z[1]
+    return [b*u1 - u2 + s*u1*(u1**2 + u2**2), u1 + b*u2 + s*u2*(u1**2 +u2**2)]
+
+
+def mod_Hopf(t,z,b,s):
+    u1, u2 = z[0], z[1]
+    return [b*u1 - u2 + s*u1*(u1**2 + u2**2) - u1*(u1**2 + u2**2)**2, u1 + b*u2 + s*u2*(u1**2 +u2**2) - u2*(u1**2 + u2**2)**2]
+
 
 #def Numerical_Continuation(initial_guess ,start, end, h,, fun):
 def Numerical_Continuation(initial_guess ,start, end, h, b, s, fun):
@@ -409,12 +418,12 @@ def Numerical_Continuation(initial_guess ,start, end, h, b, s, fun):
     Returns a graph showing how the solution of the ODE/equations
     changes as the value of beta (b) is incremented from start to end value.
     """
-    #if fun == Hopf:
-       # title = 'the Hopf bifurcation normal form'
-   # elif fun == mod_Hopf:
-        #title = 'the modified Hopf bifurcation normal form'
-    #else:
-       # raise ValueError("Invalid function. Please specify 'Hopf' or 'mod_Hopf'")
+    if fun == Hopf:
+        title = 'the Hopf bifurcation normal form'
+    elif fun == mod_Hopf:
+        title = 'the modified Hopf bifurcation normal form'
+    else:
+        raise ValueError("Invalid function. Please specify 'Hopf' or 'mod_Hopf'")
 
 
 
@@ -430,13 +439,12 @@ def Numerical_Continuation(initial_guess ,start, end, h, b, s, fun):
         y.append(root[1])
         period.append(root[2])
 
-    fig=plt.figure(figsize=(8,6))
+
     plt.xlabel('\u03B2')
     plt.ylabel('solution')
-    #plt.title(f'Natural parameter continuation of \u03B2 for the {title} equations')
-    plot = plt.plot(np.arange(start,end,h), x)
-    plot = plt.plot(np.arange(start,end,h), y)
-    #plot = plt.plot(np.arange(start,end,h), period)
+    plt.title(f'Natural parameter continuation of \u03B2 for the {title} equations')
+    plt.plot(np.arange(start,end,h), x)
+    plt.plot(np.arange(start,end,h), y)
     plt.legend(['x','y'], loc = "upper right")
     plt.show()
     return
@@ -632,7 +640,9 @@ def Numerical_Continuation_kappa(L, T, initial_condition, start, end, h, args, b
     i=0
     for i in range(len(n)):
         plt.plot(np.linspace(0, L, mx+1),n[i],'ro',label='num')
-
+    plt.xlabel('x')
+    plt.ylabel(f'u(x,{T})')
+    plt.title(plt.title(f'solution for varying diffusion coefficent for heat equation with {boundary_condition} boundary'))
     plt.show()
     return
 

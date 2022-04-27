@@ -218,26 +218,31 @@ test_myfunctions.testing_3ODE(myfunctions.shooting,[3,2,3,6.2],(ODE_system3,myfu
 def cubic(x,c):
     return x**3 - x + c
 
-# The modified Hopf bifurcation equations
-def mod_Hopf(t,z,b,s):
-    u1, u2 = z[0], z[1]
-    return [b*u1 - u2 + s*u1*(u1**2 + u2**2) - u1*(u1**2 + u2**2)**2, u1 + b*u2 + s*u2*(u1**2 +u2**2) - u2*(u1**2 + u2**2)**2]
 
 # setting parameters
 c=1
 b=1
 s=-1
 
-
 myfunctions.Numerical_Continuation_x(1, lambda x,c: x**3 - x + c , -2, 2, 0.1, c)
 
-myfunctions.Numerical_Continuation([1,0,6.2],0.1,2,0.1,b,-1,Hopf)
-
-myfunctions.Numerical_Continuation([1,0,6.2],2,-1,-0.1,b,-1,mod_Hopf)
-
+# The function Numerical_Continuation can be used to observe how changing the parameter beta (b) in the Hopf and
+# modified Hopf bifurcation equations changes the solutions of the equations.
 
 
-# PDE BIT
+# Here we use an initial guess and vary the parameter beta from 0.1 to 2 for the Hopf bifurcation system of equations
+myfunctions.Numerical_Continuation([1,0,6.2],0.1,2,0.1,b,-1,myfunctions.Hopf)
+
+
+# Here we use an initial guess and vary the parameter beta from 2 to -1 for the Modified Hopf bifurcation system of
+# equations
+myfunctions.Numerical_Continuation([1,0,6.2],2,-1,-0.1,b,-1,myfunctions.mod_Hopf)
+
+
+# Demonstrating using finite difference to solve parabolic diffusive equations
+
+# Here I define a variety of initial conditions and analytical solutions to certain boundary value problems to plot the
+# solutions to a range of problems
 
 def u_I(x):
     # initial temperature distribution
@@ -249,25 +254,27 @@ def u_exact(x,t):
     y = np.exp(-kappa*(pi**2/L**2)*t)*np.sin(pi*x/L)
     return y
 
-def u_exact1(x,t):
-    # the exact solution
-    y = 100 - 50*x - (100/pi)*(np.exp(-3*t*pi**2)*np.sin(pi*x))
-    return y
-
 def u_I1(x):
     # initial temperature distribution
     y = 50
     return y
 
-def u_exact2(x,t):
+def u_exact1(x,t):
     # the exact solution
-    y = 47.0449*np.exp(-0.0210*t)*np.sin(0.7249*x) + 45.1413*np.exp(-0.1113*t)*np.sin(1.6679*x)
+    y = 100 - 50*x - (100/pi)*(np.exp(-3*t*pi**2)*np.sin(pi*x))
     return y
 
 def u_I2(x):
     # initial temperature distribution
     y = 100*(1 - (x/3))
     return y
+
+
+def u_exact2(x,t):
+    # the exact solution
+    y = 47.0449*np.exp(-0.0210*t)*np.sin(0.7249*x) + 45.1413*np.exp(-0.1113*t)*np.sin(1.6679*x)
+    return y
+
 
 def u_I3(x):
     # initial temperature distribution
@@ -326,82 +333,109 @@ def u_exact7(x,t):
     y = np.exp(-4*t*pi**2)*np.cos(2*pi*x)
     return y
 
+
+# inhomogenous dirichlet boundary condition example:
+# using the PDE_solve_euler function with the initial condition defined as u_I4
+# dirichlet boundary condition: u(0,t)=0 and u(L,t) =8
+# k=9
+# L=2
+# T=0.5
+
 plt.plot(np.linspace(0, 2, 20+1),myfunctions.PDE_solve_euler(9,2,0.5,u_I4,args=(lambda t:0, lambda t:8), boundary_condition='dirichlet',mx=20,mt=1000),'ro',label='num')
+# plotting against the anayltical solution
 xx = np.linspace(0,2,250)
-T=2
-plt.plot(xx,u_exact4(xx,T),'b-',label='exact')
+plt.plot(xx,u_exact4(xx,0.5),'b-',label='exact')
+plt.legend(loc='upper right')
+plt.title('Solution of the heat equation with an inhomogenous dirichlet boundary')
 plt.show()
 
 
-# plotting for periodic
+# periodic boundary condition example:
+# using the PDE_solve_euler function with the initial condition defined as u_I7
+# periodic boundary condition: u(0,t)= u(L,t)
+# When we use a periodic boundary condition we do not need to input anything in the args
+# k=1
+# L=1
+# T=0.5
+
 x = np.linspace(0, 1, 20)
-plt.plot(x,myfunctions.PDE_solve_euler(1,1,0.5,u_I7, args=(lambda x: x*2, ), boundary_condition = 'periodic'),'ro',label='num')
+plt.plot(x,myfunctions.PDE_solve_euler(1,1,0.5,u_I7, args=(), boundary_condition = 'periodic'),'ro',label='num')
+# plotting with the analytical solution
 xx = np.linspace(0,1,250)
 plt.plot(xx,u_exact7(xx,0.5),'b-',label='exact')
 plt.xlabel('x')
 plt.ylabel('u(x,0.5)')
 plt.legend(loc='upper right')
+plt.title('Solution of the heat equation with a periodic boundary')
 plt.show()
 
 
 
-# Plot the final result and exact solution for forward euler
-#pl.plot(x,PDE_solve_euler(1000,10,[0,0],u_I,args=(lambda t:u_diff(0,t),lambda t:u_diff(L,t)),dirichlet=None,neumann=None,periodic=None, rhs=rhs_function),'ro',label='num')
-#x = np.linspace(0, 2, 20+1)
-#plt.plot(x,myfunctions.PDE_solve_euler(2,2,0.5,u_I5, args=(lambda x,t: np.cos(x) + t*x**2), boundary_condition = 'rhs'),'ro',label='num')
-#xx = np.linspace(0,2,250)
-#plt.plot(xx,u_exact5(xx,0.5),'b-',label='exact')
-#plt.xlabel('x')
-#plt.ylabel('u(x,0.5)')
-#plt.legend(loc='upper right')
-#plt.show()
+# homogenous neumann boundary condition example:
+# using the PDE_solve_euler function with the initial condition defined as u_I3
+# neumann boundary condition: u_x(0,t)=0 and u_x(L,t) =0
+# k=1
+# L=2
+# T=0.5
 
-
-
-# Plot the final result and exact solution for forward euler
-#pl.plot(x,PDE_solve_euler(1000,10,[0,0],u_I,args=(lambda t:u_diff(0,t),lambda t:u_diff(L,t)),dirichlet=None,neumann=None,periodic=None, rhs=rhs_function),'ro',label='num')
 x = np.linspace(0, 2, 20+1)
 plt.plot(x,myfunctions.PDE_solve_euler(1,2,0.5,u_I3, args=(lambda t:0, lambda t:0), boundary_condition = 'neumann'),'ro',label='num')
+# plot the analytical solution
 xx = np.linspace(0,2,250)
 plt.plot(xx,u_exact3(xx,0.5),'b-',label='exact')
 plt.xlabel('x')
 plt.ylabel('u(x,0.5)')
 plt.legend(loc='upper right')
+plt.title('Solution of the heat equation with a homogenous neumann boundary')
 plt.show()
 
 
-# Plot the final result and exact solution for forward euler
-#pl.plot(x,PDE_solve_euler(1000,10,[0,0],u_I,args=(lambda t:u_diff(0,t),lambda t:u_diff(L,t)),dirichlet=None,neumann=None,periodic=None, rhs=rhs_function),'ro',label='num')
+# inhomogenous heat equation (rhs function) example:
+# using the PDE_solve_euler function with the initial condition defined as u_I6
+# the rhs function is defined in the args by f(x,t) = sin(5xpi)
+# the default boundary condition is applied when using the rhs function
+# parameters are defined as k=2, L=1 and T=0.5
+
 x = np.linspace(0, 1, 20+1)
 plt.plot(x,myfunctions.PDE_solve_euler(2,1,0.5,u_I6, args=(lambda x,t: np.sin(5*pi*x)), boundary_condition = 'rhs',mx=20,mt=1000),'ro',label='num')
+# plotting the analytical solution
 xx = np.linspace(0,1,250)
 plt.plot(xx,u_exact6(xx,0.5),'b-',label='exact')
 plt.xlabel('x')
 plt.ylabel('u(x,0.5)')
 plt.legend(loc='upper right')
+plt.title('Solution of the heat equation with a rhs function')
 plt.show()
+
+
+# Next part looks at using numerical continuation to vary the diffusion coefficient kappa
 
 
 # plotting the solution of the heat equation with a homogenous neumann boundary condition. Observing how the steady
 # states change as we increment the diffusion coefficient from 0 to 2.
 L=1
-myfunctions.Numerical_Continuation_kappa(1, 0.5, u_I, 0, 2, 0.1, args=(lambda t:0, lambda t:0), boundary_condition='dirichlet', mx=20, mt=1000)
-xx = np.linspace(0,1,250)
 T = 0.5
+myfunctions.Numerical_Continuation_kappa(1, 0.5, u_I, 0, 2, 0.1, args=(lambda t:0, lambda t:0), boundary_condition='dirichlet', mx=20, mt=1000)
+
+# plot the analytical solution for the varied parameter to check
+xx = np.linspace(0,1,250)
 for kappa in np.arange(0,2,0.1):
     y = np.exp(-kappa*(pi**2/L**2)*T)*np.sin(pi*xx/L)
     plt.plot(xx,y,'b-',label='exact')
+plt.title('analytical solution for varying diffusion coefficent for heat equation with a homogenous neumann boundary')
 plt.show()
 
 
 
-
-# kappa continuation for heat equation with rhs function
+# kappa continuation for heat equation with rhs function example:
 L=1
 T = 0.5
 xx = np.linspace(0,1,21)
 myfunctions.Numerical_Continuation_kappa(1,0.5,u_I6, 0.1,2,0.1,args=(lambda x,t: np.sin(5*pi*x)), boundary_condition = 'rhs',mx=20,mt=1000)
+
+# plot the analytical solution for the varied parameter to check
 for kappa in np.arange(0.1,2,0.1):
     y = 4*np.exp(-T*kappa*(3*pi)**2)*np.sin(3*pi*x) + (1/(25*kappa*pi**2))*np.exp(-T*kappa*(5*pi)**2)*np.sin(5*pi*x) + 9*np.exp(-T*(7*pi)**2)*np.sin(7*pi*x) + (1/(kappa*25*pi**2))*np.sin(5*pi*x)
     plt.plot(xx,y,'b-',label='exact')
+plt.title('analytical solution for varying diffusion coefficent for heat equation with a rhs function')
 plt.show()
