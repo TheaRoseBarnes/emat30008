@@ -250,6 +250,17 @@ def u_I2(x):
     y = 100*(1 - (x/3))
     return y
 
+def u_I3(x):
+    # initial temperature distribution
+    y = 5*np.sin(x)
+    return y
+
+def u_exact3(x,t):
+    # the exact solution
+    y = 0.5*(5*(1-np.cos(2))) - ((20*np.cos(2) + 20)/(-4 + pi**2))*np.exp(-(pi**2)*t/2**2)*np.cos(pi*x/2)
+    return y
+
+
 # differentiated version of u
 def u_diff(x,t):
     dudx = (pi*np.exp(-kappa*(pi**2/L**2)*t)*np.cos(pi*x/L))/L
@@ -266,9 +277,87 @@ def u_exact4(x,t):
     y = 4*x - ((64/pi**3)*np.exp(t*(-9/4)*pi**2)*np.sin(pi*x/2))
     return y
 
+def u_I5(x):
+    # initial temperature distribution
+    y = np.sin(pi*x/2)
+    return y
+
+def u_exact5(x,t):
+    # the exact solution
+    y = np.exp(-2*((pi**2)/4))*np.sin(pi*x/2) + np.sin(pi*x/2)*(2/(pi**2) - 2*np.exp((-t*pi**2)/2)/pi**2)
+    return y
+
+def u_I6(x):
+    # initial temperature distribution
+    y = 4*np.sin(3*pi*x) + 9*np.sin(7*pi*x)
+    return y
+
+def u_exact6(x,t):
+    # the exact solution
+    y = 4*np.exp(-t*2*(3*pi)**2)*np.sin(3*pi*x) + (1/(25*2*pi**2))*np.exp(-t*2*(5*pi)**2)*np.sin(5*pi*x) + 9*np.exp(-t*(7*pi)**2)*np.sin(7*pi*x) + (1/(2*25*pi**2))*np.sin(5*pi*x)
+    return y
+
+def u_I7(x):
+    # initial temperature distribution
+    y = np.cos(2*pi*x)
+    return y
+
+def u_exact7(x,t):
+    # the exact solution
+    y = np.exp(-4*t*pi**2)*np.cos(2*pi*x)
+    return y
 
 plt.plot(np.linspace(0, 2, 20+1),myfunctions.PDE_solve_euler(9,2,0.5,u_I4,args=(lambda t:0, lambda t:8), boundary_condition='dirichlet',mx=20,mt=1000),'ro',label='num')
 xx = np.linspace(0,2,250)
 T=2
 plt.plot(xx,u_exact4(xx,T),'b-',label='exact')
+plt.show()
+
+
+# plotting for periodic
+x = np.linspace(0, 1, 20)
+plt.plot(x,myfunctions.PDE_solve_euler(1,1,0.5,u_I7, args=(lambda x: x*2, ), boundary_condition = 'periodic'),'ro',label='num')
+xx = np.linspace(0,1,250)
+plt.plot(xx,u_exact7(xx,0.5),'b-',label='exact')
+plt.xlabel('x')
+plt.ylabel('u(x,0.5)')
+plt.legend(loc='upper right')
+plt.show()
+
+
+
+# Plot the final result and exact solution for forward euler
+#pl.plot(x,PDE_solve_euler(1000,10,[0,0],u_I,args=(lambda t:u_diff(0,t),lambda t:u_diff(L,t)),dirichlet=None,neumann=None,periodic=None, rhs=rhs_function),'ro',label='num')
+#x = np.linspace(0, 2, 20+1)
+#plt.plot(x,myfunctions.PDE_solve_euler(2,2,0.5,u_I5, args=(lambda x,t: np.cos(x) + t*x**2), boundary_condition = 'rhs'),'ro',label='num')
+#xx = np.linspace(0,2,250)
+#plt.plot(xx,u_exact5(xx,0.5),'b-',label='exact')
+#plt.xlabel('x')
+#plt.ylabel('u(x,0.5)')
+#plt.legend(loc='upper right')
+#plt.show()
+
+
+
+# Plot the final result and exact solution for forward euler
+#pl.plot(x,PDE_solve_euler(1000,10,[0,0],u_I,args=(lambda t:u_diff(0,t),lambda t:u_diff(L,t)),dirichlet=None,neumann=None,periodic=None, rhs=rhs_function),'ro',label='num')
+x = np.linspace(0, 2, 20+1)
+plt.plot(x,myfunctions.PDE_solve_euler(1,2,0.5,u_I3, args=(lambda t:0, lambda t:0), boundary_condition = 'neumann'),'ro',label='num')
+xx = np.linspace(0,2,250)
+plt.plot(xx,u_exact3(xx,0.5),'b-',label='exact')
+plt.xlabel('x')
+plt.ylabel('u(x,0.5)')
+plt.legend(loc='upper right')
+plt.show()
+
+
+# Plot the final result and exact solution for forward euler
+#pl.plot(x,PDE_solve_euler(1000,10,[0,0],u_I,args=(lambda t:u_diff(0,t),lambda t:u_diff(L,t)),dirichlet=None,neumann=None,periodic=None, rhs=rhs_function),'ro',label='num')
+x = np.linspace(0, 1, 20+1)
+plt.plot(x,myfunctions.PDE_solve_euler(2,1,0.5,u_I6, args=(lambda x,t: np.sin(5*pi*x)), boundary_condition = 'rhs'),'ro',label='num')
+xx = np.linspace(0,1,250)
+plt.plot(xx,u_exact6(xx,0.5),'b-',label='exact')
+plt.xlabel('x')
+plt.ylabel('u(x,0.5)')
+plt.legend(loc='upper right')
 plt.show()

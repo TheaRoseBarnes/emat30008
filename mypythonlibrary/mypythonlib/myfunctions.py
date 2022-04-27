@@ -509,7 +509,7 @@ def PDE_solve_euler(kappa,L,T,initial_condition, args=(), boundary_condition=Non
             u_j[i] = initial_condition(x[i])
 
         for j in range(0, mt):
-            u_j = rhs_function(A, u_j,F_j,u_jp1,j)
+            u_j = rhs_function(A, u_j,F_j,u_jp1,j,deltat,x,t)
 
 
     else:
@@ -547,7 +547,7 @@ def PDE_solve_euler(kappa,L,T,initial_condition, args=(), boundary_condition=Non
                 Q = args[1]
                 s[0] = -P(t[j])
                 s[-1] = Q(t[j])
-                u_j = Neumann_boundary(A,s,u_j,args=args)
+                u_j = Neumann_boundary(A,s,u_j,lmbda,deltax,args=args)
 
             elif boundary_condition == None:
                 u_jp1[1:-1] = np.matmul(A , u_j[1:-1]).reshape(19,1)
@@ -584,7 +584,7 @@ def Numerical_Continuation_kappa(L, T, initial_condition, start, end, h, args, b
 
     return
 
-def rhs_function(A, u_j,F_j,u_jp1,j):
+def rhs_function(A, u_j,F_j,u_jp1,j,deltat,x,t):
     u_jp1[1:-1] = np.matmul(A , u_j[1:-1]).reshape(19,1) + deltat*F_j(x[1:-1],t[j]).reshape(19,1)
     u_j = u_jp1
     return u_j
@@ -604,7 +604,7 @@ def dirichlet_boundary(A, u_j,j,s,u_jp1,lmbda,t,mx,args):
     return  u_j
 
 
-def Neumann_boundary(A,s,u_j,args):
+def Neumann_boundary(A,s,u_j,lmbda,deltax,args):
     P = args[0]
     Q = args[1]
     u_jp1 = np.matmul(A , u_j).reshape(21,1) + 2*lmbda*deltax*s
