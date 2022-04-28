@@ -1,15 +1,10 @@
 # import relevant modules
-import numpy as np
+
 import math
-import matplotlib.pyplot as plt
-from scipy.integrate import odeint
-import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import fsolve
 from scipy.integrate import solve_ivp
 import numpy as np
-import pylab as pl
-from math import pi
 from scipy.sparse import diags
 
 def euler_solve_step(fun,h,t,x):
@@ -262,9 +257,9 @@ def solve_ode_system(fun,h,t,u0,L,solver='rk4_solve_step'):
     system of ODE's for the specified time interval.
     """
      # adding tests to check that the code handles errors gracefully
-    #if solver != 'euler_solve_step': #or 'rk4_solve_step' or 'heuns_solve_step' or 'midpoint_solve_step':
+    #if solver != 'euler_solve_step': or 'rk4_solve_step' or 'heuns_solve_step' or 'midpoint_solve_step':
         #print("INVALID SOLVER. Please specify: euler_solve_step, rk4_solve_step, heuns_solve_step or midpoint_solve_step")
-    #else:
+   # else:
 
     m = []
     for l in L:
@@ -385,6 +380,7 @@ def Numerical_Continuation_x(initial_guess, fun, start, end, h, parameter):
     plt.title('Natural parameter continuation of the cubic equation')
     plt.plot(np.arange(start,end,h), x)
     plt.legend(['x','y','period'], loc = "upper right")
+    plt.show()
     return
 
 
@@ -490,8 +486,8 @@ def Numerical_Continuation(initial_guess ,start, end, h, s, fun):
     plt.xlabel('\u03B2')
     plt.ylabel('solution')
     plt.title(f'Natural parameter continuation of \u03B2 for the {title} equations')
-    plot = plt.plot(np.arange(start,end,h), x)
-    plot = plt.plot(np.arange(start,end,h), y)
+    plt.plot(np.arange(start,end,h), x)
+    plt.plot(np.arange(start,end,h), y)
     plt.legend(['x','y'], loc = "upper right")
     plt.show()
     return

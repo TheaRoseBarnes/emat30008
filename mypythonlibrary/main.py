@@ -397,7 +397,7 @@ plt.legend(loc='upper right')
 plt.title('Solution of the heat equation with a homogenous neumann boundary')
 plt.show()
 
-test_myfunctions.testing_neumann(myfunctions.PDE_solve_euler,u_I3,1e-3 ,args=(lambda t:0, lambda t:0), boundary_condition = 'neumann')
+test_myfunctions.testing_neumann(myfunctions.PDE_solve_euler,u_I3,1e-1 ,args=(lambda t:0, lambda t:0), boundary_condition = 'neumann')
 
 
 

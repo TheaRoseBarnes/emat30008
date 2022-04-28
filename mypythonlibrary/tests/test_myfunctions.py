@@ -14,6 +14,22 @@ from math import pi
 def testing_2ODE(solver, initial_guess,tol, args):
     (Hopf,phase_condition_func,(b,s)) = args
 
+    if callable(solver) is not True:
+        error_message_fun = "The input 'solver' must be a callable function"
+        print(error_message_fun)
+        return None
+
+    if isinstance(initial_guess,list) is not True:
+        error_message_guess = "The initial guess must be list. The period should be the last entry in the list"
+        print(error_message_guess)
+        return None
+
+    if isinstance(tol, float) is not True:
+        error_message_int = "The values for the tolerance must be valid"
+        print(error_message_int)
+        return None
+
+
     # adding tests to check that the code handles errors gracefully
     if np.size(initial_guess) != 3:
         print("must specify 3 input arguments for a system of 2 ODE's")
@@ -43,6 +59,21 @@ def testing_2ODE(solver, initial_guess,tol, args):
 def testing_3ODE(solver, initial_guess,tol, args):
     (k,phase_condition_func ,(b,s)) = args
 
+    if callable(solver) is not True:
+        error_message_fun = "The input 'solver' must be a callable function"
+        print(error_message_fun)
+        return None
+
+    if isinstance(initial_guess,list) is not True:
+        error_message_guess = "The initial guess must be list. The period should be the last entry in the list"
+        print(error_message_guess)
+        return None
+
+    if isinstance(tol, float) is not True:
+        error_message_int = "The values for the tolerance must be valid"
+        print(error_message_int)
+        return None
+
     # adding tests to check that the code handles errors gracefully
     if np.size(initial_guess) != 4:
         print("must specify 4 input arguments for a system of 3 ODE's")
@@ -66,11 +97,44 @@ def testing_3ODE(solver, initial_guess,tol, args):
 
 def testing_dirichlet(solver,k,L,T,initial_condition,tol,args, boundary_condition= 'Dirichlet',mx=20,mt=1000):
 
-
     # adding tests to check that the code handles errors gracefully
-   # if np.size(initial_guess) != 3:
-        #print("must specify 3 input arguments for a system of 2 ODE's")
-    #else:
+    if callable(initial_condition) is not True:
+        error_message_initial_cond = "The initial condition must be a callable function"
+        print(error_message_initial_cond)
+        return None
+
+    if callable(solver) is not True:
+        error_message_solver= "The solver must be a callable function"
+        print(error_message_solver)
+        return None
+
+    if isinstance(L,(int,float)) is not True:
+        error_message_int = "The values of kappa, L and T should be integers or floats"
+        print(error_message_int)
+        return None
+
+    if isinstance(tol,float) is not True:
+        error_message_tol = "The tolerance must be valid"
+        print(error_message_tol)
+        return None
+
+    if isinstance(T,(int,float)) is not True:
+        error_message_int = "The values of kappa, L and T should be integers or floats"
+        print(error_message_int)
+        return None
+
+
+    if isinstance(mx,int) is not True:
+        error_message_ints = "mx and mt must be passed as integers"
+        print(error_message_ints)
+        return None
+
+    if isinstance(mt,int) is not True:
+        error_message_ints = "mx and mt must be passed as integers"
+        print(error_message_ints)
+        return None
+
+
 
     root = solver(k,L,T,initial_condition,args=args, boundary_condition= boundary_condition,mx=mx,mt=mt)
 
@@ -89,12 +153,45 @@ def testing_dirichlet(solver,k,L,T,initial_condition,tol,args, boundary_conditio
     return
 
 
+
+
 def testing_periodic(solver,k,L,T,initial_condition,tol,args, boundary_condition= 'Dirichlet',mx=20,mt=1000):
 
-    # adding tests to check that the code handles errors gracefully
-   # if np.size(initial_guess) != 3:
-        #print("must specify 3 input arguments for a system of 2 ODE's")
-    #else:
+    if callable(initial_condition) is not True:
+        error_message_initial_cond = "The initial condition must be a callable function"
+        print(error_message_initial_cond)
+        return None
+
+    if callable(solver) is not True:
+        error_message_solver= "The solver must be a callable function"
+        print(error_message_solver)
+        return None
+
+    if isinstance(L,(int,float)) is not True:
+        error_message_int = "The values of kappa, L and T should be integers or floats"
+        print(error_message_int)
+        return None
+
+    if isinstance(tol,float) is not True:
+        error_message_tol = "The tolerance must be valid"
+        print(error_message_tol)
+        return None
+
+    if isinstance(T,(int,float)) is not True:
+        error_message_int = "The values of kappa, L and T should be integers or floats"
+        print(error_message_int)
+        return None
+
+
+    if isinstance(mx,int) is not True:
+        error_message_ints = "mx and mt must be passed as integers"
+        print(error_message_ints)
+        return None
+
+    if isinstance(mt,int) is not True:
+        error_message_ints = "mx and mt must be passed as integers"
+        print(error_message_ints)
+        return None
 
     root = solver(k,L,T,initial_condition,args=args, boundary_condition= boundary_condition,mx=mx,mt=mt)
 
@@ -113,12 +210,37 @@ def testing_periodic(solver,k,L,T,initial_condition,tol,args, boundary_condition
     return
 
 
-def testing_neumann(solver,initial_condition,tol,args, boundary_condition= 'Dirichlet',mx=20,mt=1000):
 
-    # adding tests to check that the code handles errors gracefully
-   # if np.size(initial_guess) != 3:
-        #print("must specify 3 input arguments for a system of 2 ODE's")
-    #else:
+
+
+def testing_neumann(solver,initial_condition,tol,args, boundary_condition= 'Dirichlet',mx=20,mt=1000):
+    if callable(initial_condition) is not True:
+        error_message_initial_cond = "The initial condition must be a callable function"
+        print(error_message_initial_cond)
+        return None
+
+    if callable(solver) is not True:
+        error_message_solver= "The solver must be a callable function"
+        print(error_message_solver)
+        return None
+
+
+    if isinstance(tol,float) is not True:
+        error_message_tol = "The tolerance must be valid"
+        print(error_message_tol)
+        return None
+
+
+    if isinstance(mx,int) is not True:
+        error_message_ints = "mx and mt must be passed as integers"
+        print(error_message_ints)
+        return None
+
+    if isinstance(mt,int) is not True:
+        error_message_ints = "mx and mt must be passed as integers"
+        print(error_message_ints)
+        return None
+
     L = 2
     T = 0.5
     k=1
@@ -139,11 +261,42 @@ def testing_neumann(solver,initial_condition,tol,args, boundary_condition= 'Diri
     return
 
 
+
+
+
 def testing_rhs(solver,T,initial_condition,tol,args, boundary_condition= 'Dirichlet',mx=20,mt=1000):
-    # adding tests to check that the code handles errors gracefully
-   # if np.size(initial_guess) != 3:
-        #print("must specify 3 input arguments for a system of 2 ODE's")
-    #else:
+    if callable(initial_condition) is not True:
+        error_message_initial_cond = "The initial condition must be a callable function"
+        print(error_message_initial_cond)
+        return None
+
+    if callable(solver) is not True:
+        error_message_solver= "The solver must be a callable function"
+        print(error_message_solver)
+        return None
+
+
+    if isinstance(tol,float) is not True:
+        error_message_tol = "The tolerance must be valid"
+        print(error_message_tol)
+        return None
+
+    if isinstance(T,(int,float)) is not True:
+        error_message_int = "The values of kappa, L and T should be integers or floats"
+        print(error_message_int)
+        return None
+
+
+    if isinstance(mx,int) is not True:
+        error_message_ints = "mx and mt must be passed as integers"
+        print(error_message_ints)
+        return None
+
+    if isinstance(mt,int) is not True:
+        error_message_ints = "mx and mt must be passed as integers"
+        print(error_message_ints)
+        return None
+
     L = 1
     k=2
     root = solver(k,L,T,initial_condition,args=args, boundary_condition= boundary_condition,mx=mx,mt=mt)
