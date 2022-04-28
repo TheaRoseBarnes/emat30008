@@ -1,11 +1,11 @@
 # import relevant modules
-
 import math
 import matplotlib.pyplot as plt
 from scipy.optimize import fsolve
 from scipy.integrate import solve_ivp
 import numpy as np
 from scipy.sparse import diags
+
 
 def euler_solve_step(fun,h,t,x):
     """
@@ -93,6 +93,7 @@ def heuns_solve_step(fun,h,t,x):
     -------
     Returns the value of x after a single step of the Heun's method
     """
+
     f1 = fun(x,t)
     f2 = fun( x + h*(2/3),t + h*(2/3)*f1)
     return  x + h*(f1 + 3*f2)/4
@@ -122,11 +123,14 @@ def midpoint_solve_step(fun,h,t,x):
     -------
     Returns the value of x after a single step of the Midpoint method
     """
+
     x = x + (h*fun(x+(h/2), t +(h/2)*fun(x,t)))
     return  x
 
+
+
 deltat_max = 1
-def solve_to(f,h,t0,u0,T,solver):
+def solve_to(fun,h,t0,u0,T,solver):
     """
     A function that uses a specified 1-step integration method to solve steps of an ODE.
 
@@ -155,27 +159,26 @@ def solve_to(f,h,t0,u0,T,solver):
             4th-order Runge-Kutta method, 'heuns_solve_step' for the Heuns method
             or 'midpoint_solve_step' for the midpoint method.
 
-
-
     Returns
     -------
     Returns the numerical solution estimates of ODE between
     x1 at t1 and x2 at t2.
     """
 
+
     if h > deltat_max:
         print('The step-size specified is too large')
     else:
         while t0+h < T:
-            u0=solver(f,h,t0,u0)
+            u0=solver(fun,h,t0,u0)
             t0 = t0 + h
         if T!=t0:
-            u0=solver(f,T-t0,t0,u0)
+            u0=solver(fun,T-t0,t0,u0)
             t0 = T
         return u0
 
 
-def solve_ode(fun,h,t0,u0,L,solver):
+def solve_ode(fun,h,t0,u0,L,solver='rk4_solve_step'):
 
     """
     A function that uses a specified 1-step integration method to solve a specified ODE.
@@ -196,14 +199,14 @@ def solve_ode(fun,h,t0,u0,L,solver):
     u0: value(int or float)
         The initial condition for the ODE.
 
-    L:
+    L: list
+        A list of times to solve over
 
     Solver: function
             The numerical integration method used to solve the ODE. Specify
             'euler_solve_step' for the Euler method, 'rk4_solve_step' for the
             4th-order Runge-Kutta method, 'heuns_solve_step' for the Heuns method
             or 'midpoint_solve_step' for the midpoint method.
-
 
 
     Returns
@@ -217,31 +220,33 @@ def solve_ode(fun,h,t0,u0,L,solver):
         u0 = solve_to(fun,h,t0,u0,l,solver)
         t0=l
         m.append(u0)
-    error = abs(math.exp(l)-u0)
+        error = abs(math.exp(l)-u0)
+
     return m, error
 
-def solve_ode_system(fun,h,t,u0,L,solver='rk4_solve_step'):
+def solve_ode_system(fun,h,t0,u0,L,solver='rk4_solve_step'):
+
     """
-    A function that uses a specified 1-step integration method to solve a system
-    of specified ODE's.
+    A function that uses a specified 1-step integration method to solve a specified ODE.
 
     Parameters
     ----------
     fun : function
-        The system of ODE's we wish to solve. The ode function should take
+        The ODE we wish to solve. The ode function should take
         a single parameter (the state vector) and return the
         right-hand side of the ODE as a numpy.array.
 
     h : value(int or float)
         step_size
 
-    t:  value(int or float)
+    t0:  value(int or float)
         the initial time
 
-    u0:  numpy.array
-        The initial conditions for the ODE.
+    u0: value(int or float)
+        The initial condition for the ODE.
 
-    L:
+    L: list
+        A list of times to solve over
 
     Solver: function
             The numerical integration method used to solve the ODE. Specify
@@ -250,23 +255,21 @@ def solve_ode_system(fun,h,t,u0,L,solver='rk4_solve_step'):
             or 'midpoint_solve_step' for the midpoint method.
 
 
-
     Returns
     -------
-    Returns a list of numpy.arrays containing the x and y numerical solution estimates to the
-    system of ODE's for the specified time interval.
+    Returns a numpy.array containing the numerical solution estimates of ODE
+    for the specified time interval as well as the error.
     """
-     # adding tests to check that the code handles errors gracefully
-    #if solver != 'euler_solve_step': or 'rk4_solve_step' or 'heuns_solve_step' or 'midpoint_solve_step':
-        #print("INVALID SOLVER. Please specify: euler_solve_step, rk4_solve_step, heuns_solve_step or midpoint_solve_step")
-   # else:
 
     m = []
     for l in L:
-        u0 = solve_to(fun,h,t,u0,l,solver)
-        t=l
+        u0 = solve_to(fun,h,t0,u0,l,solver)
+        t0=l
         m.append(u0)
+
     return m
+
+
 
 def phase_condition_func(func, u, T, args):
     return func(T,u,*args)[0]
@@ -305,11 +308,6 @@ def shooting(u0, function, phase_condition,args):
         print(error_message_fun)
         return None
 
-    #if isinstance(u0,list) is not True:
-       # error_message_guess = "The initial guess u0 must be list. The period should be the last entry in the list"
-       # print(error_message_guess)
-        #return None
-
     if callable(phase_condition) is not True:
         error_message_phase = "The input 'phase_condition' must be a callable function"
         print(error_message_phase)
@@ -319,7 +317,6 @@ def shooting(u0, function, phase_condition,args):
         error_message_args = "The arguments must be passed as a tuple"
         print(error_message_args)
         return None
-
 
     u, T = u0[:-1], u0[-1]
     if u[0]== 0:
@@ -495,7 +492,42 @@ def Numerical_Continuation(initial_guess ,start, end, h, s, fun):
 
 
 
-def finite_diff(kappa, L, T, initial_condition ,method = 'Forward-Euler', mx=20, mt=1000):
+def finite_diff(kappa, L, T, initial_condition ,method = 'Crank-Nicholson', mx=20, mt=1000):
+    """
+    A function that uses the forward-euler method, backward-euler method or Crank-nicholson scheme with finite
+    differences to solve the 1D heat equation with a homogeneous dirichlet boundary and specified initial condition.
+
+    Parameters
+    ----------
+    kappa:  int
+            The diffusion constant
+
+    L:  int
+        length of the domain
+
+    T:  int
+        Total time to solve for
+
+    initial_condition:  function
+                        The initial temperature distribution. Can be inputted in the command line using 'lambda' or an
+                        initial condition function can be inputted.
+
+    method = string
+            specify the method used to integrate and solve the problem:
+            'Forward-Euler' for the forward euler method
+            'Backward-Euler for the backward euler method
+            'Crank-Nicholson for the crank-nicholson scheme
+
+    mx = int
+         The number of gridpoints in space
+
+    mt = int
+         The number of gridpoints in time
+
+    Returns
+    -------
+    returns an array of the solutions to the specified PDE problem
+    """
 
 
     if callable(initial_condition) is not True:
@@ -586,7 +618,7 @@ def finite_diff(kappa, L, T, initial_condition ,method = 'Forward-Euler', mx=20,
     else:
         raise ValueError("Invalid method, please input 'Forward-Euler', 'Backward-Euler' or 'Crank-Nicholson'.")
 
-    return u_j
+    return  u_j
 
 
 
@@ -633,13 +665,8 @@ def PDE_solve_euler(kappa,L,T,initial_condition, args=(), boundary_condition=Non
 
     Returns
     -------
-    returns an array of of the solutions to the specified PDE problem
+    returns an array  of the solutions to the specified PDE problem
     """
-
-   # if callable(initial_condition) is not True:
-        #error_message_initial_cond = "The initial condition must be a callable function"
-        #print(error_message_initial_cond)
-        #return None
 
     if isinstance(kappa,(int,float)) is not True:
         error_message_int = "The values of kappa, L and T should be integers or floats"
