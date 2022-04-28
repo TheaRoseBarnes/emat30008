@@ -199,7 +199,7 @@ s = -1
 # an initial guess that I know should return a root close to the true value. If this is the case, the output will return
 # 'passed'
 from tests import test_myfunctions
-test_myfunctions.testing_2ODE(myfunctions.shooting,[1,0,6.2],(Hopf,myfunctions.phase_condition_func,(1,-1)))
+test_myfunctions.testing_2ODE(myfunctions.shooting,[1,0,6.2],1e-04,(Hopf,myfunctions.phase_condition_func,(1,-1)))
 
 # adding another dimension to the Hopf bifurcation equations so that we have a system of 3 ODE's
 def ODE_system3(t,z,b,s):
@@ -207,7 +207,7 @@ def ODE_system3(t,z,b,s):
     return [b*u1 - u2 + s*u1*(u1**2 + u2**2), u1 + b*u2 + s*u2*(u1**2 +u2**2), -u3]
 
 # Testing the shooting for the system of 3 ODEs
-test_myfunctions.testing_3ODE(myfunctions.shooting,[3,2,3,6.2],(ODE_system3,myfunctions.phase_condition_func,(1,-1)))
+test_myfunctions.testing_3ODE(myfunctions.shooting,[3,2,3,6.2],1e-03,(ODE_system3,myfunctions.phase_condition_func,(1,-1)))
 
 
 # Next, I will demonstrate how to use the numerical continuation functions found in the library
@@ -231,12 +231,12 @@ myfunctions.Numerical_Continuation_x(1, lambda x,c: x**3 - x + c , -2, 2, 0.1, c
 
 
 # Here we use an initial guess and vary the parameter beta from 0.1 to 2 for the Hopf bifurcation system of equations
-myfunctions.Numerical_Continuation([1,0,6.2],0.1,2,0.1,b,-1,myfunctions.Hopf)
+myfunctions.Numerical_Continuation([1,0,6.2],0.1,2,0.1,-1,myfunctions.Hopf)
 
 
 # Here we use an initial guess and vary the parameter beta from 2 to -1 for the Modified Hopf bifurcation system of
 # equations
-myfunctions.Numerical_Continuation([1,0,6.2],2,-1,-0.1,b,-1,myfunctions.mod_Hopf)
+myfunctions.Numerical_Continuation([1,0,6.2],2,-1,-0.1,-1,myfunctions.mod_Hopf)
 
 
 # Demonstrating using finite difference to solve parabolic diffusive equations
@@ -351,7 +351,7 @@ plt.show()
 
 # Another way of testing the solution more technically rather than visually is to import the testing_dirichlet function
 # from the test_myfunctions
-test_myfunctions.testing_dirichlet(myfunctions.PDE_solve_euler,9,2,0.5,u_I4,args=(lambda t:0, lambda t:8), boundary_condition='dirichlet',mx=20,mt=1000)
+test_myfunctions.testing_dirichlet(myfunctions.PDE_solve_euler,9,2,0.5,u_I4,1e-5,args=(lambda t:0, lambda t:8), boundary_condition='dirichlet',mx=20,mt=1000)
 
 
 
@@ -375,7 +375,7 @@ plt.legend(loc='upper right')
 plt.title('Solution of the heat equation with a periodic boundary')
 plt.show()
 
-test_myfunctions.testing_periodic(myfunctions.PDE_solve_euler,1,1,0.5,u_I7, args=(), boundary_condition = 'periodic')
+test_myfunctions.testing_periodic(myfunctions.PDE_solve_euler,1,1,0.5,u_I7,1e-4 ,args=(), boundary_condition = 'periodic')
 
 
 
@@ -397,7 +397,7 @@ plt.legend(loc='upper right')
 plt.title('Solution of the heat equation with a homogenous neumann boundary')
 plt.show()
 
-test_myfunctions.testing_neumann(myfunctions.PDE_solve_euler,u_I3, args=(lambda t:0, lambda t:0), boundary_condition = 'neumann')
+test_myfunctions.testing_neumann(myfunctions.PDE_solve_euler,u_I3,1e-3 ,args=(lambda t:0, lambda t:0), boundary_condition = 'neumann')
 
 
 
@@ -417,6 +417,8 @@ plt.ylabel('u(x,0.5)')
 plt.legend(loc='upper right')
 plt.title('Solution of the heat equation with a rhs function')
 plt.show()
+
+test_myfunctions.testing_rhs(myfunctions.PDE_solve_euler,0.5,u_I6,1e-2 ,args=(lambda x,t: np.sin(5*pi*x)), boundary_condition = 'rhs',mx=20,mt=1000)
 
 
 # Next part looks at using numerical continuation to vary the diffusion coefficient kappa
